@@ -1,6 +1,6 @@
 %h1 World UNESCO Heritage Sites
 
-#map{style: "height: 50vh; width: 96%; margin: 0 2%;"}
+#map{style: "height: 90vh; width: 96%; margin: 0 2%;"}
 
 :javascript
   function initMap() {
@@ -9,12 +9,26 @@
       center: new google.maps.LatLng(20,0),
     });
 
+    // Load all sites from DB
     var sites = #{JSON.dump(Site.all.to_a.as_json)};
+    var selected_sites = new BitArray(2048);
+
+    // Parse query string
+    var url = new Url;
+    if (url.query.map) {
+      selected_sites = new BitArray(2048, LZString.decompressFromEncodedURIComponent(url.query.map));
+    }
+
     var markers = $.map(sites, function(site) {
+      var icon = undefined;
+      if (selected_sites.get(site.site_id)) {
+        icon = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+      }
       var latLng = new google.maps.LatLng(site.latitude, site.longitude);
       var marker = new google.maps.Marker({
-            position: latLng,
-        map: map
+        position: latLng,
+        map: map,
+        icon: icon
       });
 
       var infowindow = new google.maps.InfoWindow({
@@ -23,6 +37,18 @@
 
       google.maps.event.addListener(marker, 'click', function() {
         infowindow.open(map, marker);
+
+        if (selected_sites.get(site.site_id)) {
+          marker.setIcon(undefined);
+          selected_sites.set(site.site_id, false);
+        } else {
+          marker.setIcon('https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png');
+          selected_sites.set(site.site_id, true);
+        }
+
+        var url = new Url;
+        url.query.map = LZString.compressToEncodedURIComponent(selected_sites.toHexString());
+        window.history.replaceState(undefined, 'Unesco Map', url.toString())
       });
 
       return marker;

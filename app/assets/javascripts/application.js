@@ -16,3 +16,4 @@
 //= require_tree .
 //= require bit-array
 //= require lz-string
+//= require url
