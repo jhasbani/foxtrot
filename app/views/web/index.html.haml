@@ -1,1 +1,35 @@
-%h1 hi
+%h1 World UNESCO Heritage Sites
+
+#map{style: "height: 50vh; width: 96%; margin: 0 2%;"}
+
+:javascript
+  function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 2,
+      center: new google.maps.LatLng(20,0),
+    });
+
+    var sites = #{JSON.dump(Site.all.to_a.as_json)};
+    var markers = $.map(sites, function(site) {
+      var latLng = new google.maps.LatLng(site.latitude, site.longitude);
+      var marker = new google.maps.Marker({
+            position: latLng,
+        map: map
+      });
+
+      var infowindow = new google.maps.InfoWindow({
+        content: site.name
+      });
+
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.open(map, marker);
+      });
+
+      return marker;
+    });
+
+    var markerCluster = new MarkerClusterer(map, markers, {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+  }
+
+%script{src: "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"}
+%script{async: true, defer: true, src: "https://maps.googleapis.com/maps/api/js?key=AIzaSyDIKvMNEr7qLDhIfzN6_LbmvpJvTpMT6qs&callback=initMap"}
