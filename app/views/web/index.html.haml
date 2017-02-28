@@ -1,6 +1,12 @@
-%h1 World UNESCO Heritage Sites
+%div{style: "width: 96%; margin: 0 2%;"}
 
-#map{style: "height: 90vh; width: 96%; margin: 0 2%;"}
+  %h1 World UNESCO Heritage Sites
+
+  %input{type: 'checkbox', name: 'edit_mode', id: 'edit_mode', checked: true}
+  %label{for: 'edit_mode'} Edit Mode
+
+  #map{style: "height: 90vh;"}
+
 
 :javascript
   function initMap() {
@@ -12,6 +18,7 @@
     // Load all sites from DB
     var sites = #{JSON.dump(Site.all.to_a.as_json)};
     var selected_sites = new BitArray(2048);
+    var selected_icon = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
 
     // Parse query string
     var url = new Url;
@@ -19,10 +26,12 @@
       selected_sites = new BitArray(2048, LZString.decompressFromEncodedURIComponent(url.query.map));
     }
 
+    var infowindow = new google.maps.InfoWindow({});
+
     var markers = $.map(sites, function(site) {
       var icon = undefined;
       if (selected_sites.get(site.site_id)) {
-        icon = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+        icon = selected_icon;
       }
       var latLng = new google.maps.LatLng(site.latitude, site.longitude);
       var marker = new google.maps.Marker({
@@ -30,22 +39,27 @@
         map: map,
         icon: icon
       });
-
-      var infowindow = new google.maps.InfoWindow({
-        content: site.name
-      });
+      marker.site = site;
 
       google.maps.event.addListener(marker, 'click', function() {
+        if (!$('#edit_mode').is(':checked')) {
+          return;
+        }
+
+        // Show info window
+        infowindow.setContent(site.name);
         infowindow.open(map, marker);
 
+        // Toggle selection state
         if (selected_sites.get(site.site_id)) {
           marker.setIcon(undefined);
           selected_sites.set(site.site_id, false);
         } else {
-          marker.setIcon('https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png');
+          marker.setIcon(selected_icon);
           selected_sites.set(site.site_id, true);
         }
 
+        // Update Url String
         var url = new Url;
         url.query.map = LZString.compressToEncodedURIComponent(selected_sites.toHexString());
         window.history.replaceState(undefined, 'Unesco Map', url.toString())
@@ -54,8 +68,22 @@
       return marker;
     });
 
-    var markerCluster = new MarkerClusterer(map, markers, {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+    var markerCluster = new MarkerClusterer(map, markers, {ignoreHidden: true, imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+
+    $('#edit_mode').change( function() {
+      if (!$(this).is(':checked')) {
+        $.each(markers, function(i, marker) {
+          if (!selected_sites.get(marker.site.site_id)) {
+            marker.setVisible(false);
+          }
+        });
+      } else {
+        $.each(markers, function(i, marker) {
+            marker.setVisible(true);
+        });
+      }
+      markerCluster.repaint();
+    });
   }
 
-%script{src: "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"}
 %script{async: true, defer: true, src: "https://maps.googleapis.com/maps/api/js?key=AIzaSyDIKvMNEr7qLDhIfzN6_LbmvpJvTpMT6qs&callback=initMap"}

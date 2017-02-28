@@ -222,4 +222,4 @@ BitArray.prototype.xor = function (x) {
 	return this;
 };
 
-module.exports = BitArray;
+// module.exports = BitArray;

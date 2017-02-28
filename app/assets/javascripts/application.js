@@ -16,4 +16,5 @@
 //= require_tree .
 //= require bit-array
 //= require lz-string
+//= require markerclusterer
 //= require url
