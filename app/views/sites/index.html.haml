@@ -1,0 +1,19 @@
+.container
+  %h1 Listing Sites
+
+  %table.table
+    %thead
+      %tr
+        %th ID
+        %th Name
+        %th Lat
+        %th Lng
+        %th URL
+    %tbody
+      - @sites.each do |site|
+        %tr
+          %td= site.site_id
+          %td= site.name
+          %td= site.latitude
+          %td= site.longitude
+          %td= link_to site.url, site.url, target: '_blank'
