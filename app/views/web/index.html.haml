@@ -9,6 +9,10 @@
 
 
 :javascript
+  function editMode() {
+    return $('#edit_mode').is(':checked');
+  }
+
   function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
       zoom: 2,
@@ -17,6 +21,7 @@
 
     // Load all sites from DB
     var sites = #{JSON.dump(Site.all.to_a.as_json)};
+    window.sites = sites;
     var selected_sites = new BitArray(2048);
     var selected_icon = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
 
@@ -28,6 +33,7 @@
 
     var infowindow = new google.maps.InfoWindow({});
 
+    // Build a marker per site
     var markers = $.map(sites, function(site) {
       var icon = undefined;
       if (selected_sites.get(site.site_id)) {
@@ -40,29 +46,18 @@
         icon: icon
       });
       marker.site = site;
+      site.marker = marker;
 
+      // Bind click on marker event
       google.maps.event.addListener(marker, 'click', function() {
-        if (!$('#edit_mode').is(':checked')) {
-          return;
+        if (editMode()) {
+          infowindow.setContent("<a href='" + site.url +"' target='_blank'>" + site.name + "</a>&nbsp;<button class='btn btn-success btn-xs' data-site-id='" + site.site_id + "'>Toggle</button>");
+        }  else {
+          infowindow.setContent("<a href='" + site.url +"' target='_blank'>" + site.name + "</a>");
         }
 
         // Show info window
-        infowindow.setContent(site.name);
         infowindow.open(map, marker);
-
-        // Toggle selection state
-        if (selected_sites.get(site.site_id)) {
-          marker.setIcon(undefined);
-          selected_sites.set(site.site_id, false);
-        } else {
-          marker.setIcon(selected_icon);
-          selected_sites.set(site.site_id, true);
-        }
-
-        // Update Url String
-        var url = new Url;
-        url.query.map = LZString.compressToEncodedURIComponent(selected_sites.toHexString());
-        window.history.replaceState(undefined, 'Unesco Map', url.toString())
       });
 
       return marker;
@@ -70,18 +65,42 @@
 
     var markerCluster = new MarkerClusterer(map, markers, {ignoreHidden: true, imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 
-    $('#edit_mode').change( function() {
-      if (!$(this).is(':checked')) {
-        $.each(markers, function(i, marker) {
-          if (!selected_sites.get(marker.site.site_id)) {
-            marker.setVisible(false);
-          }
-        });
+    // Handle toggle button within marker infowindow
+    $(document).on('click', 'button', function() {
+      var site_id = $(this).data('site-id');
+
+      // Find the marker (is there a much better way?)
+      var marker = undefined;
+      $.each(sites, function(i, site) {
+        if (site.site_id == site_id) {
+          marker = site.marker;
+        }
+      });
+
+      // Toggle selection state
+      if (selected_sites.get(site_id)) {
+        marker.setIcon(undefined);
+        selected_sites.set(site_id, false);
       } else {
-        $.each(markers, function(i, marker) {
-            marker.setVisible(true);
-        });
+        marker.setIcon(selected_icon);
+        selected_sites.set(site_id, true);
       }
+
+      // Update Url String
+      var url = new Url;
+      url.query.map = LZString.compressToEncodedURIComponent(selected_sites.toHexString());
+      window.history.replaceState(undefined, 'Unesco Map', url.toString())
+    });
+
+    // Toggle edit mode
+    $('#edit_mode').change( function() {
+      infowindow.close();
+
+      // In RO mode, hide unselected markers
+      $.each(markers, function(i, marker) {
+        marker.setVisible(editMode() || selected_sites.get(marker.site.site_id));
+      });
+
       markerCluster.repaint();
     });
 
