@@ -1,8 +1,8 @@
 %div{style: "width: 96%; margin: 0 2%;"}
 
-  %h1 World UNESCO Heritage Sites
+  %h1 UNESCO World Heritage Sites
 
-  %input{type: 'checkbox', name: 'edit_mode', id: 'edit_mode', checked: true}
+  %input{type: 'checkbox', name: 'edit_mode', id: 'edit_mode'}
   %label{for: 'edit_mode'} Edit Mode
 
   #map{style: "height: 90vh;"}
@@ -84,6 +84,8 @@
       }
       markerCluster.repaint();
     });
+
+    $('#edit_mode').change();
   }
 
 %script{async: true, defer: true, src: "https://maps.googleapis.com/maps/api/js?key=AIzaSyDIKvMNEr7qLDhIfzN6_LbmvpJvTpMT6qs&callback=initMap"}
