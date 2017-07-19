@@ -21,6 +21,10 @@ module FoxTrot
     # config.i18n.default_locale = :de
 
 	config.brand = 'FoxTrot'
-	config.root_url = '/'
+
+	# These are sourced from environment variables to protect the secret.
+	# On Huroku, they are set in the app dashboard. Locally, they are set in .env
+	config.fb_app_id = ENV['FB_APP_ID']
+	config.fb_app_secret = ENV['FB_APP_SECRET']
   end
 end

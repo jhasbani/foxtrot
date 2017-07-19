@@ -1,9 +1,55 @@
 %nav.navbar.navbar-default.navbar-static-top
-	.container-fluid
-		.navbar-header
-			%button.navbar-toggle.collapsed{data: {toggle: 'collapse', target: 'navbar-collapse'}, aria: {expanded: 'false'}}
-				%span.sr-only Toggle Navagation
-				%span.icon-bar
-				%span.icon-bar
-				%span.icon-bar
-		%a.navbar-brand{href: FoxTrot::Application.config.root_url}= FoxTrot::Application.config.brand
+  .container-fluid
+    .navbar-header
+      %button.navbar-toggle.collapsed{data: {toggle: 'collapse', target: 'navbar-collapse'}, aria: {expanded: 'false'}}
+        %span.sr-only Toggle Navagation
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      %a.navbar-brand{href: root_url}= Rails.configuration.brand
+    .collapse.navbar-collapse{id: 'navbar-collapse'}
+      %ul.nav.navbar-nav.navbar-right
+        %li
+          - if current_user.present?
+            %a{href: signout_path, id: 'sign_out'}Sign Out
+          - else
+            %a{href: '/auth/facebook', id: 'sign_in'}Sign In with Facebook
+
+
+
+:javascript
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '#{Rails.configuration.fb_app_id}',
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v2.8'
+    });
+    FB.AppEvents.logPageView();
+
+    $('#sign_in').click( function(e) {
+      e.preventDefault();
+
+      FB.login( function(response) {
+        if (response.authResponse) {
+          window.location = '/auth/facebook/callback';
+        }
+      });
+    });
+
+    $('#sign_out').click( function(e) {
+      FB.getLoginStatus( function(response) {
+        if (response.authResponse) {
+          FB.logout();
+        }
+      });
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
