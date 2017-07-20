@@ -1,11 +1,18 @@
-%div{style: "width: 96%; margin: 0 2%;"}
+.container-fluid
+  .row
+    .col-md-11
+      %h1= @map.title
+    .col-md-1
+      - if current_user.present?
+        .fb-share-button{data: {href: user_maps_url(current_user.id, @map.id), layout: 'button'}}
+  .row
+    .col-md-10
+      %input{type: 'checkbox', name: 'edit_mode', id: 'edit_mode'}
+      %label{for: 'edit_mode'} Edit Mode
 
-  %h1= @map.title
-
-  %input{type: 'checkbox', name: 'edit_mode', id: 'edit_mode'}
-  %label{for: 'edit_mode'} Edit Mode
-
-  #map{style: "height: 90vh;"}
+      #map{style: "height: 90vh;"}
+    .col-md-2
+      Site listing
 
 
 :javascript

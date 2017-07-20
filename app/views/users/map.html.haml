@@ -1,0 +1,9 @@
+- content_for :head do
+  %meta{property: 'og:url', content: request.url}
+  %meta{property: 'og:type', content: 'website'}
+  %meta{property: 'og:title', content: "FoxTrot | #{@map.title}"}
+  %meta{property: 'og:description', content: "I have visited N oof M #{@map.title}! See them here!"}
+
+%p#notice= notice
+
+

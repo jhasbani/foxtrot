@@ -1,11 +1,16 @@
-%h1 Listing maps
+.container-fluid
+  .row
+    .col-md-12
+      %h1 Listing maps
 
-%table
-  %thead
-    %tr
-      %th
+      %table.table
+        %thead
+          %tr
+            %th Map
+            %th Total Sites
 
-  %tbody
-    - @maps.each do |map|
-      %tr
-        %td= link_to map.title, map
+        %tbody
+          - @maps.each do |map|
+            %tr
+              %td= link_to map.title, map
+              %td= map.sites.count

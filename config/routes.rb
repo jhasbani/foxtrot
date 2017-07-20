@@ -5,6 +5,10 @@ Rails.application.routes.draw do
 
   resources :sites, only: [:index, :show]
 
+  resources :users, only: [:show]
+
+  match '/users/:user_id/maps/:map_id', to: 'users#map', via: [:get], as: 'user_maps'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
