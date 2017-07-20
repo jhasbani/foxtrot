@@ -11,10 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170719175532) do
+ActiveRecord::Schema.define(version: 20170720170632) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "maps", force: :cascade do |t|
+    t.string   "title"
+    t.string   "description"
+    t.string   "url"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
 
   create_table "sites", force: :cascade do |t|
     t.integer "site_id"
@@ -23,7 +31,10 @@ ActiveRecord::Schema.define(version: 20170719175532) do
     t.decimal "longitude"
     t.string  "url"
     t.string  "region"
+    t.integer "map_id"
   end
+
+  add_index "sites", ["map_id"], name: "index_sites_on_map_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "provider"
@@ -43,4 +54,5 @@ ActiveRecord::Schema.define(version: 20170719175532) do
     t.datetime "updated_at"
   end
 
+  add_foreign_key "sites", "maps"
 end
