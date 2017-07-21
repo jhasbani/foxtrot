@@ -24,6 +24,7 @@ class UsersController < ApplicationController
 
   # GET /users/1/maps/2
   def map
+    @visits = [] # Visit.where(user_id: @user.id, map_id: @map.id)
   end
 
   # POST /users

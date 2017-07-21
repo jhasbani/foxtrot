@@ -2,8 +2,15 @@
   %meta{property: 'og:url', content: request.url}
   %meta{property: 'og:type', content: 'website'}
   %meta{property: 'og:title', content: "FoxTrot | #{@map.title}"}
-  %meta{property: 'og:description', content: "I have visited N oof M #{@map.title}! See them here!"}
+  %meta{property: 'og:description', content: "I have visited #{@visits.count} of #{@map.sites.count} #{@map.title}! See them here!"}
 
 %p#notice= notice
 
+.container-fluid
+  .row
+    .col-md-12
+      - if current_user.try(:id) == params[:user_id].to_i
+        %pre
+          This is a public view of your map. If you'd like to edit it,&nbsp;
+          = link_to 'go here', map_url(@map)
 

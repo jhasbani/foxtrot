@@ -10,9 +10,13 @@
       %input{type: 'checkbox', name: 'edit_mode', id: 'edit_mode'}
       %label{for: 'edit_mode'} Edit Mode
 
-      #map{style: "height: 90vh;"}
-    .col-md-2
-      Site listing
+      #map{style: "height: 85vh;"}
+    .col-md-2{style: "height: 85vh; overflow-y: auto;, overflow-x: none;"}
+      %table.table
+        - @map.sites.each do |site|
+          %tr
+            %td.map-site{data: {site_id: site.id}}
+              = site.name
 
 
 :javascript
