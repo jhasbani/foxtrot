@@ -13,6 +13,11 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
+//= require underscore
+//= require backbone
+//= require railsy_backbone.sync
+//= require railsy_backbone.datalink
+//= require backbone/fox_trot
 //= require_tree .
 //= require bit-array
 //= require lz-string
