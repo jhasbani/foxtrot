@@ -11,24 +11,24 @@
       .js-replace-map{style: "height: 85vh;"}
 
     .col-md-2{style: "height: 85vh; overflow-y: auto;, overflow-x: none;"}
-      %table.table
-        - @map.sites.order(:name).each do |site|
-          %tr
-            %td.map-site{data: {site_id: site.id}}
-              = site.name
-
+      %table.table.js-append-sites
 
 :javascript
   // Load all sites from DB
-  var sites = #{JSON.dump(@map.sites.to_a.as_json)};
+  var sites = #{JSON.dump(@map.sites.order(:name).to_a.as_json)};
 
   var settings = new FoxTrot.Models.Settings();
 
   (new FoxTrot.Views.ModeToggle({el: $('.js-replace-mode-toggle'), settings: settings})).render();
 
   function initMap() {
-    new FoxTrot.Views.Map({el: $('.js-replace-map'), settings: settings, sites: sites});
+    window.map = new FoxTrot.Views.Map({el: $('.js-replace-map'), settings: settings, sites: sites});
   }
+
+  var listing = $('.js-append-sites')
+  $.each(sites, function(i, site) {
+    listing.append( (new FoxTrot.Views.SiteListingEntry({settings: settings, site: site})).render().el );
+  })
 
 %script{async: true, defer: true, src: "//maps.googleapis.com/maps/api/js?key=AIzaSyDIKvMNEr7qLDhIfzN6_LbmvpJvTpMT6qs&callback=initMap"}
 

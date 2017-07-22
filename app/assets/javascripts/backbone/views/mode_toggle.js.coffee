@@ -10,6 +10,7 @@ class FoxTrot.Views.ModeToggle extends Backbone.View
 
   render: ->
     $(@el).html(@template(@settings.attributes))
+    @
 
   onChange: ->
     mode = @$('input:checked').val()
