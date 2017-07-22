@@ -1,0 +1,11 @@
+%label
+  Sites:
+.btn-group{data: {toggle: 'buttons'}}
+  %label.btn.btn-primary{class: if @mode == 'all' then 'active' else ''}
+    %input{type: 'radio', name: 'mode_toggle_options', id: 'mode_toggle_all', value: 'all', autocomplete: 'off', checked: @mode == 'all'} All
+  %label.btn.btn-primary{class: if @mode == 'visited' then 'active' else ''}
+    .glyphicon.glyphicon-ok
+    %input{type: 'radio', name: 'mode_toggle_options', id: 'mode_toggle_visited', value: 'visited', autocomplete: 'off', checked: @mode == 'visited'} Visited
+  %label.btn.btn-primary{class: if @mode == 'wish' then 'active' else ''}
+    .glyphicon.glyphicon-heart
+    %input{type: 'radio', name: 'mode_toggle_options', id: 'mode_toggle_wish', value: 'wish', autocomplete: 'off', checked: @mode == 'wish'} Some Day

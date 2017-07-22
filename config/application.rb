@@ -26,5 +26,7 @@ module FoxTrot
 	# On Huroku, they are set in the app dashboard. Locally, they are set in .env
 	config.fb_app_id = ENV['FB_APP_ID']
 	config.fb_app_secret = ENV['FB_APP_SECRET']
+
+  config.hamlcoffee.name_filter = lambda { |n| n.sub(/^backbone\//, '').sub(/^templates\//, '') }
   end
 end

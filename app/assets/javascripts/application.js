@@ -18,6 +18,7 @@
 //= require railsy_backbone.sync
 //= require railsy_backbone.datalink
 //= require backbone/fox_trot
+//= require hamlcoffee
 //= require_tree .
 //= require bit-array
 //= require lz-string
