@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy, :maps]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :map]
   before_action :set_map, only: [:map]
 
   # GET /users

@@ -7,6 +7,8 @@ Rails.application.routes.draw do
 
   resources :users, only: [:show]
 
+  resources :visits
+
   match '/users/:user_id/maps/:map_id', to: 'users#map', via: [:get], as: 'user_maps'
 
   # The priority is based upon order of creation: first created -> highest priority.

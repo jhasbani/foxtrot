@@ -4,8 +4,6 @@
   %meta{property: 'og:title', content: "FoxTrot | #{@map.title}"}
   %meta{property: 'og:description', content: "I have visited #{@visits.count} of #{@map.sites.count} #{@map.title}! See them here!"}
 
-%p#notice= notice
-
 .container-fluid
   .row
     .col-md-12
@@ -13,4 +11,38 @@
         %pre
           This is a public view of your map. If you'd like to edit it,&nbsp;
           = link_to 'go here', map_url(@map)
+  .row
+    .col-md-11
+      %h1= @map.title
+    .col-md-1
+      - if current_user.present?
+        .fb-share-button{data: {href: user_maps_url(current_user.id, @map.id), layout: 'button'}}
+  .row
+    .col-md-10
+      .js-replace-mode-toggle
+      .js-replace-map{style: "height: 85vh;"}
+
+    .col-md-2{style: "height: 85vh; overflow-y: auto;, overflow-x: none;"}
+      %table.table.js-append-sites
+
+:javascript
+  var user = new FoxTrot.Models.User( #{JSON.dump(@user.as_json.with_indifferent_access.slice(:id, :name))} );
+
+  // Load all sites from DB
+  var sites = #{JSON.dump(@map.sites.order(:name).to_a.as_json)};
+
+  var settings = new FoxTrot.Models.Settings({user: user, readonly: true, mode: 'visited'});
+
+  (new FoxTrot.Views.ModeToggle({el: $('.js-replace-mode-toggle'), settings: settings})).render();
+
+  function initMap() {
+    new FoxTrot.Views.Map({el: $('.js-replace-map'), settings: settings, sites: sites});
+  }
+
+  var listing = $('.js-append-sites')
+  $.each(sites, function(i, site) {
+    listing.append( (new FoxTrot.Views.SiteListingEntry({settings: settings, site: site})).render().el );
+  })
+
+%script{async: true, defer: true, src: "//maps.googleapis.com/maps/api/js?key=AIzaSyDIKvMNEr7qLDhIfzN6_LbmvpJvTpMT6qs&callback=initMap"}
 

@@ -1,0 +1,18 @@
+%p#notice= notice
+
+%p
+  %b Site:
+  = @visit.site
+%p
+  %b User:
+  = @visit.user
+%p
+  %b Visited:
+  = @visit.visited
+%p
+  %b Wished:
+  = @visit.wished
+
+= link_to 'Edit', edit_visit_path(@visit)
+\|
+= link_to 'Back', visits_path

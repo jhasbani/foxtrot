@@ -49,6 +49,7 @@ class FoxTrot.Views.Map extends Backbone.View
     
     @listenTo(Backbone, 'foxtrot:sitelisting:select', @selectSite)
     @listenTo(@settings, 'change:mode', @redraw)
+    @redraw()
 
   # In reaction to a display mode change, redraw the markers.
   redraw: =>

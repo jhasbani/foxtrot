@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  site_id: 
+  user_id: 
+  visited: 
+  wished: false
+
+two:
+  site_id: 
+  user_id: 
+  visited: 
+  wished: false
