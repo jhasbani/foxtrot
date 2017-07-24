@@ -13,7 +13,11 @@
           = link_to 'go here', map_url(@map)
   .row
     .col-md-11
-      %h1= @map.title
+      %h1
+        = @map.title
+        %small
+          for
+          = @user.display_name
     .col-md-1
       - if current_user.present?
         .fb-share-button{data: {href: user_maps_url(current_user.id, @map.id), layout: 'button'}}
@@ -31,17 +35,21 @@
   // Load all sites from DB
   var sites = #{JSON.dump(@map.sites.order(:name).to_a.as_json)};
 
+  // Load visits for this map and user
+  var visits = new FoxTrot.Collections.VisitsCollection();
+  visits.set( #{ JSON.dump(@user.visits.for_map(@map).to_a.as_json) } );
+
   var settings = new FoxTrot.Models.Settings({user: user, readonly: true, mode: 'visited'});
 
   (new FoxTrot.Views.ModeToggle({el: $('.js-replace-mode-toggle'), settings: settings})).render();
 
   function initMap() {
-    new FoxTrot.Views.Map({el: $('.js-replace-map'), settings: settings, sites: sites});
+    new FoxTrot.Views.Map({el: $('.js-replace-map'), settings: settings, sites: sites, visits: visits});
   }
 
   var listing = $('.js-append-sites')
   $.each(sites, function(i, site) {
-    listing.append( (new FoxTrot.Views.SiteListingEntry({settings: settings, site: site})).render().el );
+    listing.append( (new FoxTrot.Views.SiteListingEntry({settings: settings, site: site, visits: visits})).render().el );
   })
 
 %script{async: true, defer: true, src: "//maps.googleapis.com/maps/api/js?key=AIzaSyDIKvMNEr7qLDhIfzN6_LbmvpJvTpMT6qs&callback=initMap"}

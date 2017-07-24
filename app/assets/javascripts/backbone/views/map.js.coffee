@@ -3,6 +3,7 @@ class FoxTrot.Views.Map extends Backbone.View
   initialize: (options) ->
     @settings = options.settings
     @sites = options.sites
+    @visits = options.visits
 
     @gmap = new google.maps.Map(@el, {
       zoom: 2,
@@ -20,6 +21,9 @@ class FoxTrot.Views.Map extends Backbone.View
       icon = undefined
 
       # TODO: set the icon depending on visit/wish state
+      visit = @visits.findWhere(site_id: site.id)
+      if visit and visit.visited
+        icon = selected_icon
 
       latLng = new google.maps.LatLng(site.latitude, site.longitude)
       marker = new google.maps.Marker({
@@ -42,57 +46,53 @@ class FoxTrot.Views.Map extends Backbone.View
 
     @markerCluster = new MarkerClusterer(@gmap, @markers, {ignoreHidden: true, imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'})
 
-    # Handle toggle button within marker infowindow
-    # The infowindow is outside of this element, hence document.on
-    $(document).on('click', 'button.toggle-visit', @handleVisit)
-    $(document).on('click', 'button.toggle-wish', @handleWish)
-    
     @listenTo(Backbone, 'foxtrot:sitelisting:select', @selectSite)
     @listenTo(@settings, 'change:mode', @redraw)
     @redraw()
 
   # In reaction to a display mode change, redraw the markers.
   redraw: =>
+    if (@visitToggle)
+      @visitToggle.remove()
+      @visitToggle = undefined
     @infowindow.close()
 
-    # TODO: show markers that match the mode.
+    @updateMarkers()
+
+  updateMarkers: =>
+    # show markers that match the mode.
 
     mode = @settings.get('mode')
     $.each(@markers, (i, marker) =>
-      marker.setVisible(mode == 'all')
+      visable = false
+      if mode == 'all'
+        visable = true
+      else
+        visit = @visits.findWhere(site_id: marker.site.id)
+        if visit and ((mode == 'visited' and visit.visted) or (mode == 'wished' and visit.wished))
+          visable = true
+      marker.setVisible(visable)
     )
     @markerCluster.repaint()
     
-
-  handleVisit: ->  
-    site_id = $(this).data('site-id')
-    # Find the marker (is there a much better way?)
-    marker = undefined
-    $.each(sites, (i, site) ->
-      if (site.id == site_id)
-        marker = site.marker
-    )
-
-    # TODO: toggle the state in the DB
-    # TODO: redraw visit buttons
-    # TODO: set marker icon
-    # marker.setIcon(undefined)
-
-  handleWish: ->
-    ;
-
 
   # Display the tooltip for the site.
   showMarkerInfo: (marker) =>
     site = marker.site
 
+    if (@visitToggle)
+      @visitToggle.remove()
+      @visitToggle = undefined
     @infowindow.close()
 
-    @infowindow.setContent("<a href='#{site.url}' target='_blank'>#{site.name}</a>&nbsp;<button class='btn btn-success btn-xs toggle-visit' data-site-id='#{site.id}'><div class='glyphicon glyphicon-ok'></div></button>")
+    @infowindow.setContent("<a href='#{site.url}' target='_blank'>#{site.name}</a>&nbsp;<span class='js-replace-visit-toggle'></span>")
        
     # Show info window
     @infowindow.open(@gmap, marker)
     @infowindow.setPosition(marker.getPosition())
+
+    unless @settings.get('readonly')
+      (new FoxTrot.Views.VisitToggle(el: $('.js-replace-visit-toggle'), settings: @settings, site: site, visits: @visits)).render()
     
 
   # In reaction to a click in the list, set the selected site.

@@ -1,0 +1,7 @@
+.btn-group{data: {toggle: 'buttons'}}
+  %label.btn.btn-link{class: if @visited then 'active' else ''}
+    .glyphicon.glyphicon-ok
+    %input{type: 'checkbox', name: 'visit_toggle_options', value: 'visited', autocomplete: 'off', checked: @visited}
+  %label.btn.btn-link{class: if @wished then 'active' else ''}
+    .glyphicon.glyphicon-heart
+    %input{type: 'checkbox', name: 'visit_toggle_options', value: 'wished', autocomplete: 'off', checked: @wished}

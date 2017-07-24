@@ -1,6 +1,14 @@
 class User < ActiveRecord::Base
 
-  has_many :visits
+  has_many :visits do
+    def for_map(map)
+      where(site_id: map.sites.ids)
+    end
+  end
+
+  def display_name
+    name.sub(/(.* [A-Za-z])[A-Za-z]*/, '\1')
+  end
 
 	# Callback from omniauth when authenticated
   def self.from_omniauth(auth)
